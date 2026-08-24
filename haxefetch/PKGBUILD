@@ -6,13 +6,16 @@ arch=('x86_64')
 url="https://github.com/Sbinator-hub/Haxefetch"
 license=('MIT')
 
-source=("haxefetch::https://github.com/Sbinator-hub/Haxefetch/raw/refs/heads/main/binary/haxefetch")
+source=(
+	"haxefetch::https://github.com/Sbinator-hub/Haxefetch/raw/refs/heads/main/binary/haxefetch"
+	"completion/haxefetch.fish"
+)
 sha256sums=('25d11b439f7d7a43f9948797dfeecf27dc5157afb9b7543e17dccfb30d4baf3a')
 
 options=('!debug')
 
 package() {
 	install -Dm755 haxefetch "$pkgdir/usr/bin/haxefetch"
-	install -Dm644 completion/haxefetch.fish \ "${pkgdir}/usr/share/fish/vendor_completion.d/haxefetch.fish"
+	install -Dm644 "$srcdir/haxefetch.fish" \ "${pkgdir}/usr/share/fish/vendor_completion.d/haxefetch.fish"
 	
 }
