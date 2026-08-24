@@ -10,7 +10,7 @@ conflicts=('haxefetch')
 
 source=("${pkgname}-${pkgver}.tar.gz::https://github.com/Sbinator-hub/Haxefetch/releases/download/${pkgver}/haxefetch-${pkgver}.tar.gz")
 
-sha256sums=('640efef8828c0a342b0a79e2e94a15edf1928d8dfd2a79aaa8301b07228e0528')
+sha256sums=('c6608e9d23619f17e6ca8d7b79405d7c392f261cdb9537839baedca52621f5d4')
 
 options=('!debug')
 
