@@ -8,7 +8,7 @@ license=('MIT')
 provides=('haxefetch')
 conflicts=('haxefetch')
 
-source=("${_pkgname}-${pkgver}.tar.gz::${url}/releases/download/${pkgver}/haxefetch.tar.gz")
+source=("${pkgname}-${pkgver}.tar.gz::https://github.com/Sbinator-hub/Haxefetch/releases/download/${pkgver}/haxefetch-${pkgver}.tar.gz")
 
 sha256sums=('640efef8828c0a342b0a79e2e94a15edf1928d8dfd2a79aaa8301b07228e0528')
 
