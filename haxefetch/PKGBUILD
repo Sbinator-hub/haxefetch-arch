@@ -13,6 +13,6 @@ options=('!debug')
 
 package() {
 	install -Dm755 haxefetch "$pkgdir/usr/bin/haxefetch"
-	install -Dm644 "completion/haxefetch.fish" \ "${pkgdir}/usr/share/fish/vendor_completion.d/haxefetch.fish"
+	install -Dm644 completion/haxefetch.fish \ "${pkgdir}/usr/share/fish/vendor_completion.d/haxefetch.fish"
 	
 }
