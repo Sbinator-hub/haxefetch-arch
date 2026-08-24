@@ -10,7 +10,7 @@ source=(
 	"haxefetch::https://github.com/Sbinator-hub/Haxefetch/raw/refs/heads/main/binary/haxefetch"
 )
 
-sha256sums=('25d11b439f7d7a43f9948797dfeecf27dc5157afb9b7543e17dccfb30d4baf3a')
+sha256sums=('640efef8828c0a342b0a79e2e94a15edf1928d8dfd2a79aaa8301b07228e0528')
 
 options=('!debug')
 
