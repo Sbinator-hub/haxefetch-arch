@@ -42,11 +42,12 @@ jobs:
         run: |
           cd "$GITHUB_WORKSPACE"
           mkdir -p x86_64
+          
           cp haxefetch-git/*.pkg.tar.zst x86_64/
+          
           cd x86_64
 
-          # Fix: Standard repo-add generates haxefetch.db.tar.gz
-          repo-add haxefetch.db.tar.gz *.pkg.tar.zst
+          repo-add -R haxefetch.db.tar.gz *.pkg.tar.zst
 
           rm -f haxefetch.db haxefetch.files
           cp haxefetch.db.tar.gz haxefetch.db
