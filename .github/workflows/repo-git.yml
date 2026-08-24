@@ -1,4 +1,4 @@
-name: Arch Linux Haxefetch repo container
+name: Arch Linux Haxefetch Repo Container (git)
 
 on:
   workflow_dispatch:
@@ -6,14 +6,12 @@ on:
     branches:
       - main
     paths:
-      - 'haxefetch/PKGBUILD'
+      - 'haxefetch-git/PKGBUILD'
       - 'src/**'
       - 'bin/**'
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 jobs:
   build:
@@ -22,18 +20,11 @@ jobs:
       image: archlinux:base-devel
     steps:
       - uses: actions/checkout@v4
-        with:
-          lfs: false
 
       - name: Mark workspace safe
         run: |
           pacman -Sy --noconfirm git pacman-contrib
           git config --global --add safe.directory "*"
-
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          safe_directory: '*'
 
       - name: Create non-root user
         run: |
@@ -42,21 +33,18 @@ jobs:
 
       - name: Generate Checksums & Build Package
         run: |
-          cd "$GITHUB_WORKSPACE/haxefetch"
+          cd "$GITHUB_WORKSPACE/haxefetch-git"
           chown -R builder:builder .
-          
-          # Run updpkgsums as builder user
           su builder -c "updpkgsums"
-          
-          # Build package as builder user
           su builder -c "makepkg -sc --noconfirm"
 
       - name: Update repository database
         run: |
           mkdir -p x86_64
-          cp haxefetch/*.pkg.tar.zst x86_64/
+          cp haxefetch-git/*.pkg.tar.zst x86_64/
           cd x86_64
 
+          # Uses -R to replace old git pkg entries safely when local zst is copied
           repo-add haxefetch.db.tar.zst *.pkg.tar.zst
 
           rm -f haxefetch.db haxefetch.files
@@ -67,11 +55,9 @@ jobs:
 
       - name: Commit and push updated repo and PKGBUILD
         run: |
-          cd "$GITHUB_WORKSPACE"
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          git add x86_64/ haxefetch/PKGBUILD
-          git status
-          git diff-index --quiet HEAD || git commit -m "Auto-update checksums & build repo [skip ci]"
+          git add x86_64/ haxefetch-git/PKGBUILD
+          git diff-index --quiet HEAD || git commit -m "Auto-update haxefetch-git [skip ci]"
           git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:main
