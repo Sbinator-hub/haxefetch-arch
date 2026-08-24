@@ -1,77 +1,47 @@
 name: Arch Linux Haxefetch repo container
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - 'haxefetch/PKGBUILD'
-      - 'src/**'
-      - 'bin/**'
-
-permissions:
-  contents: write
-  pages: write
-  id-token: write
+  release:
+    types: [published]
 
 jobs:
-  build:
+  build-arch-repo:
     runs-on: ubuntu-latest
-    container:
-      image: archlinux:base-devel
+    container: archlinux:latest
+
     steps:
-      - uses: actions/checkout@v4
-        with:
-          lfs: false
-
-      - name: Mark workspace safe
+      - name: Install dependencies
         run: |
-          pacman -Sy --noconfirm git pacman-contrib
-          git config --global --add safe.directory "*"
+          pacman -Syu --noconfirm base-devel git repo-add
 
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          safe_directory: '*'
 
-      - name: Create non-root user
+      - name: Prepare Build Directory
         run: |
-          useradd -m builder
-          echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-
-      - name: Generate Checksums & Build Package
-        run: |
-          cd "$GITHUB_WORKSPACE/haxefetch"
+          useradd builder -m
           chown -R builder:builder .
-          
-          # Run updpkgsums as builder user
-          su builder -c "updpkgsums"
-          
-          # Build package as builder user
-          su builder -c "makepkg -sc --noconfirm"
 
-      - name: Update repository database
+      - name: Build Arch Package
+        run: |
+          su builder -c "updpkgsums"
+          su builder -c "makepkg -s --noconfirm"
+
+      - name: Update Repository Database
         run: |
           mkdir -p x86_64
-          cp haxefetch/*.pkg.tar.zst x86_64/
+          cp *.pkg.tar.zst x86_64/
           cd x86_64
-
           repo-add haxefetch.db.tar.zst *.pkg.tar.zst
-
+          
+          # Maintain symlinks for pacman compatibility
           rm -f haxefetch.db haxefetch.files
           cp haxefetch.db.tar.zst haxefetch.db
-          if [ -f haxefetch.files.tar.zst ]; then
-            cp haxefetch.files.tar.zst haxefetch.files
-          fi
+          [ -f haxefetch.files.tar.zst ] && cp haxefetch.files.tar.zst haxefetch.files
 
-      - name: Commit and push updated repo and PKGBUILD
-        run: |
-          cd "$GITHUB_WORKSPACE"
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          
-          git add x86_64/ haxefetch/PKGBUILD
-          git status
-          git diff-index --quiet HEAD || git commit -m "Auto-update checksums & build repo [skip ci]"
-          git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:main
+      - name: Deploy to GitHub Pages / Repo Branch
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./x86_64
+          keep_files: true
