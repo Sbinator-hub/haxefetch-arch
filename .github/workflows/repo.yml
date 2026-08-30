@@ -39,8 +39,8 @@ jobs:
           mkdir -p x86_64
           cp haxefetch/*.pkg.tar.zst x86_64/
           cd x86_64
-          repo-add haxefetch.db.tar.gz haxefetch-1.0.0-1-x86_64.pkg.tar.zst
-          
+          repo-add haxefetch.db.tar.zst haxefetch-*.pkg.tar.zst
+
           rm -f haxefetch.db haxefetch.files
           cp haxefetch.db.tar.zst haxefetch.db
           [ -f haxefetch.files.tar.zst ] && cp haxefetch.files.tar.zst haxefetch.files
